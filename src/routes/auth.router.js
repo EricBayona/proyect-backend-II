@@ -3,7 +3,8 @@ import { userDao } from "../persistence/mongo/dao/user.dao.js";
 import { comparePassword, hashPassword } from "../utils/hasPassword.js";
 import { authRole } from "../middlewares/authRole.middleware.js";
 import { createToken } from "../utils/jsonWebtoken.js";
-import { checkTokenHeader } from "../middlewares/checkTokenHeader.middleware.js";
+// import { checkTokenHeader } from "../middlewares/checkTokenHeader.middleware.js";
+import { checkTokenCookie } from "../middlewares/checkTokenCookie.middleware.js";
 
 const router = Router();
 
@@ -26,6 +27,8 @@ router.post("/login", async (req, res) => {
         }
 
         const token = createToken(tokenInfo);
+
+        res.cookie("token", token, { httpOnly: true });
 
         res.status(200).json({ user, token });
     } catch (error) {
@@ -53,7 +56,7 @@ router.post("/register", async (req, res) => {
     }
 });
 
-router.get("/profile", checkTokenHeader, authRole(["admin", "user"]), async (req, res) => {
+router.get("/profile", checkTokenCookie, authRole(["admin", "user"]), async (req, res) => {
     try {
         res.status(200).json({ user: req.user });
     } catch (error) {

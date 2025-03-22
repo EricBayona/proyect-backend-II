@@ -3,6 +3,7 @@ import { connectMongoDB } from "./config/mongoDB.config.js";
 import routes from "./routes/index.js"
 import envsConfig from "./config/envs.config.js";
 import session from "express-session";
+import cookieParser from "cookie-parser";
 
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(session({
     cookie: { secure: false, maxAge: 500000 }, // Debe estar en true si usas HTTPS
 
 }))
+
+app.use(cookieParser())
 
 app.use("/api", routes);
 
