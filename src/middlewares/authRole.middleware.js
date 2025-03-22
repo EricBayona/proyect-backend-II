@@ -1,8 +1,8 @@
-export const authRole = (role) => {
+export const authRole = (roles) => {
     return (req, res, next) => {
         try {
-            if (!req.session.user) return res.status(400).json({ status: "Error", msg: "No autenticado" });
-            if (role !== req.session.user.role) return res.status(403).json({ status: "Error", msg: "No tiene permiso" });
+            if (!req.user) return res.status(400).json({ status: "Error", msg: "No autenticado" });
+            if (!roles.includes(req.user.role)) return res.status(403).json({ status: "Error", msg: "No tiene permiso" });
 
             next()
         } catch (error) {
