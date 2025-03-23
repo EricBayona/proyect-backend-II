@@ -4,6 +4,7 @@ import routes from "./routes/index.js"
 import envsConfig from "./config/envs.config.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import passport from "./config/passport/passport.config.js";
 
 
 const app = express();
@@ -22,7 +23,9 @@ app.use(session({
 
 }))
 
-app.use(cookieParser())
+app.use(cookieParser());
+
+app.use(passport.initialize());
 
 app.use("/api", routes);
 
