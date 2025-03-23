@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import { userDao } from "../../persistence/mongo/dao/user.dao.js";
 import { hashPassword, comparePassword } from "../../utils/hasPassword.js";
+import { cartDao } from "../../persistence/mongo/dao/cart.dao.js";
 
 
 const registerStrategy = new Strategy(
@@ -11,9 +12,11 @@ const registerStrategy = new Strategy(
             const user = await userDao.getOne({ email: username });
             if (user) return done(null, false, { message: "El usuario ya existe" });
 
+            const newCart = await cartDao.create();
             const newUser = {
                 ...req.body,
                 password: hashPassword(password),
+                cart: newCart._id,
             };
 
             const userCreate = await userDao.create(newUser);

@@ -6,19 +6,28 @@ import { createToken } from "../utils/jsonWebtoken.js";
 // import { checkTokenHeader } from "../middlewares/checkTokenHeader.middleware.js";
 import { checkTokenCookie } from "../middlewares/checkTokenCookie.middleware.js";
 import passport from "passport";
+import { passportCall } from "../middlewares/passportCall.middleware.js";
 
 const router = Router();
 
-router.post("/login", passport.authenticate("login"), async (req, res) => {
+router.post("/login", passportCall("login"), async (req, res) => {
     try {
-        res.status(200).json({ user: req.user });
+        const tokenData = {
+            id: req.user._id,
+            email: req.user.email,
+            role: req.user.role
+        };
+
+        const token = createToken(tokenData);
+        res.cookie("token", token, { httpOnly: true });
+        res.status(200).json({ user: req.user, token });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: "error", message: "Internal Server Error" });
     }
 });
 
-router.post("/register", passport.authenticate("register"), async (req, res) => {
+router.post("/register", passportCall("register"), async (req, res) => {
     try {
         res.status(201).json({ message: req.user });
     } catch (error) {
@@ -27,7 +36,7 @@ router.post("/register", passport.authenticate("register"), async (req, res) => 
     }
 });
 
-router.get("/profile", checkTokenCookie, authRole(["admin", "user"]), async (req, res) => {
+router.get("/profile", passportCall("jwt"), authRole(["admin", "user"]), async (req, res) => {
     try {
         res.status(200).json({ user: req.user });
     } catch (error) {
