@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { productDao } from "../persistence/mongo/dao/product.dao.js";
+import { validateSchema } from "../middlewares/validateSchema.middleware.js";
+import { editProductSchema } from "../schemas/products.schema.js"
 
 const router = Router();
 
@@ -64,13 +66,13 @@ router.delete("/:pid", async (req, res) => {
     }
 })
 
-router.put("/:pid", async (req, res) => {
+router.put("/", validateSchema(editProductSchema), async (req, res) => {
     try {
-        const { pid } = req.params;
+        const { title } = req.query;
         const productData = req.body;
-        const product = await productDao.update(pid, productData);
+        const product = await productDao.update({ title }, productData);
         if (!product) return res.status(404).json({ status: "ok", msg: "Producto no encontrado" });
-        res.status(200).json({ status: "Ok", msg: `Producto con id ${pid} se actualizo de forma corecta `, product })
+        res.status(200).json({ status: "Ok", msg: `Producto con id ${title} se actualizo de forma corecta `, product })
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: "Error", msg: "Error interno del Servidor" })

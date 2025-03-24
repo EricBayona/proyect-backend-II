@@ -17,8 +17,8 @@ class ProductDao {
         return product;
     }
 
-    async update(id, data) {
-        const productUpdate = await productModel.findByIdAndUpdate(id, data, { new: true });
+    async update({ title }, data) {
+        const productUpdate = await productModel.findOneAndUpdate({ title }, data, { new: true });
         return productUpdate;
     }
     async deleteOne(id) {

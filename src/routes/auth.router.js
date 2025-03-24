@@ -3,14 +3,17 @@ import { userDao } from "../persistence/mongo/dao/user.dao.js";
 import { comparePassword, hashPassword } from "../utils/hasPassword.js";
 import { authRole } from "../middlewares/authRole.middleware.js";
 import { createToken } from "../utils/jsonWebtoken.js";
-// import { checkTokenHeader } from "../middlewares/checkTokenHeader.middleware.js";
+import { checkTokenHeader } from "../middlewares/checkTokenHeader.middleware.js";
 import { checkTokenCookie } from "../middlewares/checkTokenCookie.middleware.js";
 import passport from "passport";
 import { passportCall } from "../middlewares/passportCall.middleware.js";
+import { validateSchema } from "../middlewares/validateSchema.middleware.js";
+import { loginSchema } from "../schemas/login.Schema.js";
+import { registerSchema } from "../schemas/register.schema.js";
 
 const router = Router();
 
-router.post("/login", passportCall("login"), async (req, res) => {
+router.post("/login", validateSchema(loginSchema), passportCall("login"), async (req, res) => {
     try {
         const tokenData = {
             id: req.user._id,
@@ -27,7 +30,7 @@ router.post("/login", passportCall("login"), async (req, res) => {
     }
 });
 
-router.post("/register", passportCall("register"), async (req, res) => {
+router.post("/register", validateSchema(registerSchema), passportCall("register"), async (req, res) => {
     try {
         res.status(201).json({ message: req.user });
     } catch (error) {
